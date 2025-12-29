@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber-X Titan | Forensic Intelligence Dashboard</title>
+    <title>Case Gauge | Forensic Intelligence Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
@@ -61,7 +61,7 @@
                 <i class="bi bi-shield-check text-black text-2xl"></i>
             </div>
             <div>
-                <h1 class="font-extrabold text-xl tracking-tight text-white uppercase">Cyber-X <span class="text-yellow-500 italic">Titan</span></h1>
+                <h1 class="font-extrabold text-xl tracking-tight text-white uppercase">Case Gauge <span class="text-yellow-500 italic">Titan</span></h1>
                 <p class="text-[9px] text-gray-500 font-mono tracking-widest">ADVANCED FORENSIC ASSESSMENT</p>
             </div>
         </div>
@@ -178,8 +178,8 @@
     </main>
 
     <footer class="mt-20 border-t border-white/5 py-10 text-center">
-        <p class="text-gray-500 text-[10px] tracking-widest font-mono">© 2025 CYBER-X TITAN | ALL RIGHTS RESERVED</p>
-        <p class="text-gray-400 text-[10px] mt-2 uppercase font-bold tracking-tighter">Developed with ❤️ by <span class="text-yellow-500 italic">Gemini Pro</span></p>
+        <p class="text-gray-500 text-[10px] tracking-widest font-mono">© 2025 CASE GAUGE | ALL RIGHTS RESERVED</p>
+        <p class="text-gray-400 text-[10px] mt-2 uppercase font-bold tracking-tighter">Developed with ❤️ by <span class="text-yellow-500 italic">Karndeep Baror</span></p>
     </footer>
 
     <script>
@@ -224,7 +224,7 @@
             doc.setTextColor(251, 191, 36);
             doc.setFontSize(22);
             doc.setFont("helvetica", "bold");
-            doc.text("CYBER-X TITAN: CASE DOSSIER", 20, 25);
+            doc.text("CASE GAUGE : CASE DOSSIER", 20, 25);
             
             doc.setFontSize(10);
             doc.setTextColor(200, 200, 200);
@@ -269,7 +269,7 @@
             // Footer / Legal
             doc.setFontSize(8);
             doc.setTextColor(100, 100, 100);
-            doc.text("Generated via Cyber-X Titan System. Admissible under Sec 65B IEA logic.", 20, 285);
+            doc.text("Generated via Case Gauge Titan System. Admissible under Sec 65B IEA logic.", 20, 285);
             doc.text("This is an automated readiness report for law enforcement reference.", 20, 290);
 
             doc.save(`TITAN_REPORT_${Date.now()}.pdf`);

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InvestigateReady | Cyber Fraud Confidence Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background: #0f172a; color: white; }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .gradient-text { background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        input[type="range"] { accent-color: #38bdf8; }
+    </style>
+</head>
+<body class="min-h-screen pb-12">
+
+    <nav class="p-6 border-b border-white/10 flex justify-between items-center sticky top-0 bg-[#0f172a]/80 z-50">
+        <div class="flex items-center gap-2">
+            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-xl">🛡️</div>
+            <span class="text-xl font-bold tracking-tight">INVESTIGATE<span class="text-blue-400">READY</span></span>
+        </div>
+        <div class="hidden md:block text-sm text-gray-400">Police-Grade Evidence Assessment Tool v1.0</div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-6 mt-10">
+        <header class="text-center mb-12 animate__animated animate__fadeIn">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Fraud Case <span class="gradient-text">Confidence Score</span></h1>
+            <p class="text-gray-400 max-w-xl mx-auto text-lg">Evaluate your case's legal strength and investigation readiness with forensic-aligned logic.</p>
+        </header>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            
+            <div class="md:col-span-2 space-y-6">
+                
+                <section class="glass-card p-6 rounded-2xl">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">🔍 Evidence Availability</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <label class="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer transition">
+                            <input type="checkbox" class="w-5 h-5 form-checkbox" onchange="calculateScore()" data-weight="20" id="ev_bank_sms">
+                            <span>Bank Transaction SMS</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer transition">
+                            <input type="checkbox" class="w-5 h-5" onchange="calculateScore()" data-weight="15" id="ev_upi_id">
+                            <span>Suspect UPI ID / A/c No.</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer transition">
+                            <input type="checkbox" class="w-5 h-5" onchange="calculateScore()" data-weight="10" id="ev_chat">
+                            <span>Original Chat Logs</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer transition">
+                            <input type="checkbox" class="w-5 h-5" onchange="calculateScore()" data-weight="10" id="ev_recording">
+                            <span>Call Recordings</span>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="glass-card p-6 rounded-2xl">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">⏱️ Time Since Incident</h3>
+                    <input type="range" id="time_gap" min="1" max="100" value="1" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" oninput="calculateScore()">
+                    <div class="flex justify-between text-sm mt-3 text-gray-400">
+                        <span>< 24 Hours (Golden Hour)</span>
+                        <span>Over 7 Days</span>
+                    </div>
+                    <p id="time_desc" class="mt-4 text-blue-400 font-medium"></p>
+                </section>
+
+                <section class="glass-card p-6 rounded-2xl border-red-500/20">
+                    <h3 class="text-xl font-semibold mb-4 text-red-400 flex items-center gap-2">⚠️ Penalty Check (Common Mistakes)</h3>
+                    <div class="space-y-3">
+                        <label class="flex items-center gap-3 text-sm text-gray-300">
+                            <input type="checkbox" class="penalty-check" onchange="calculateScore()" data-penalty="30">
+                            <span>Did you reset the phone/app? (-30 points)</span>
+                        </label>
+                        <label class="flex items-center gap-3 text-sm text-gray-300">
+                            <input type="checkbox" class="penalty-check" onchange="calculateScore()" data-penalty="20">
+                            <span>Are screenshots edited/cropped? (-20 points)</span>
+                        </label>
+                    </div>
+                </section>
+            </div>
+
+            <div class="space-y-6">
+                <div class="glass-card p-8 rounded-2xl sticky top-24 text-center">
+                    <h3 class="text-gray-400 uppercase tracking-widest text-xs font-bold mb-4">Case Confidence Score</h3>
+                    <div id="score_circle" class="text-6xl font-black mb-2 transition-all duration-500">0</div>
+                    <div id="score_label" class="text-sm font-bold px-3 py-1 rounded-full inline-block mb-6">NONE</div>
+                    
+                    <div class="text-left space-y-4 text-sm border-t border-white/10 pt-6">
+                        <div class="flex justify-between"><span>Recovery Prob:</span> <span id="rec_prob" class="font-bold text-gray-300">N/A</span></div>
+                        <div class="flex justify-between"><span>Traceability:</span> <span id="trace_index" class="font-bold text-gray-300">N/A</span></div>
+                    </div>
+
+                    <button onclick="generatePDF()" class="w-full mt-8 bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-blue-500/20 active:scale-95">
+                        Download Police Report
+                    </button>
+                    <p class="text-[10px] text-gray-500 mt-4 leading-relaxed">Privacy Protected: No data leaves your browser.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function calculateScore() {
+            let score = 0;
+            const evidence = document.querySelectorAll('input[type="checkbox"]:not(.penalty-check)');
+            const penalties = document.querySelectorAll('.penalty-check');
+            const timeGap = document.getElementById('time_gap').value;
+
+            // 1. Evidence Points (Max 55)
+            evidence.forEach(item => { if(item.checked) score += parseInt(item.getAttribute('data-weight')); });
+
+            // 2. Time Logic (Max 30)
+            let timePoints = 0;
+            let timeText = "";
+            if(timeGap < 10) { timePoints = 30; timeText = "🔥 Golden Hour: High Recovery Chance!"; }
+            else if(timeGap < 40) { timePoints = 15; timeText = "⏳ Moderate Delay: Report Immediately."; }
+            else { timePoints = 5; timeText = "⚠️ Significant Delay: Digital evidence might be lost."; }
+            score += timePoints;
+            document.getElementById('time_desc').innerText = timeText;
+
+            // 3. Suspect Traceability (Simulated Bonus 15)
+            if(document.getElementById('ev_upi_id').checked) score += 15;
+
+            // 4. Penalties
+            penalties.forEach(item => { if(item.checked) score -= parseInt(item.getAttribute('data-penalty')); });
+
+            // Clamp score between 0-100
+            score = Math.max(0, Math.min(100, score));
+
+            // UI Update
+            const scoreEl = document.getElementById('score_circle');
+            const labelEl = document.getElementById('score_label');
+            scoreEl.innerText = score;
+
+            if(score >= 70) {
+                scoreEl.className = "text-6xl font-black mb-2 text-green-400 animate__animated animate__pulse";
+                labelEl.innerText = "STRONG CASE";
+                labelEl.className = "text-sm font-bold px-3 py-1 rounded-full inline-block bg-green-500/20 text-green-400";
+                updateStats("High", "High");
+            } else if(score >= 40) {
+                scoreEl.className = "text-6xl font-black mb-2 text-yellow-400";
+                labelEl.innerText = "MEDIUM CASE";
+                labelEl.className = "text-sm font-bold px-3 py-1 rounded-full inline-block bg-yellow-500/20 text-yellow-400";
+                updateStats("Moderate", "Medium");
+            } else {
+                scoreEl.className = "text-6xl font-black mb-2 text-red-400";
+                labelEl.innerText = "WEAK CASE";
+                labelEl.className = "text-sm font-bold px-3 py-1 rounded-full inline-block bg-red-500/20 text-red-400";
+                updateStats("Low", "Difficult");
+            }
+        }
+
+        function updateStats(prob, trace) {
+            document.getElementById('rec_prob').innerText = prob;
+            document.getElementById('trace_index').innerText = trace;
+        }
+
+        async function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const score = document.getElementById('score_circle').innerText;
+            const label = document.getElementById('score_label').innerText;
+            
+            doc.setFontSize(22);
+            doc.text("Cyber Crime Investigation Readiness Report", 20, 20);
+            doc.setFontSize(14);
+            doc.text(`Confidence Score: ${score}/100`, 20, 40);
+            doc.text(`Status: ${label}`, 20, 50);
+            doc.text("-------------------------------------------", 20, 60);
+            doc.text("Action Plan:", 20, 70);
+            doc.text("1. Dial 1930 immediately.", 20, 80);
+            doc.text("2. File complaint on cybercrime.gov.in", 20, 90);
+            doc.text("3. Present this report to the local Cyber Cell.", 20, 100);
+            
+            doc.save("Cyber_Fraud_Report.pdf");
+        }
+
+        // Initialize
+        calculateScore();
+    </script>
+</body>
+</html>

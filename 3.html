@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber-X Titan | Forensic Intelligence Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        :root {
+            --primary-gold: #fbbf24;
+            --deep-carbon: #111111;
+            --border-glow: rgba(251, 191, 36, 0.2);
+        }
+
+        body { 
+            font-family: 'Outfit', sans-serif; 
+            background-color: #080808; 
+            color: #e5e7eb;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(251, 191, 36, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(251, 191, 36, 0.03) 0px, transparent 50%);
+            background-size: cover;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        
+        .premium-card { 
+            background: rgba(20, 20, 20, 0.8); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .gold-glow { border: 1px solid var(--primary-gold); box-shadow: 0 0 15px var(--border-glow); }
+        .tab-active { color: var(--primary-gold); border-bottom: 2px solid var(--primary-gold); background: rgba(251, 191, 36, 0.05); }
+        
+        input, select, textarea {
+            background: rgba(255, 255, 255, 0.03) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            color: white !important;
+            transition: all 0.3s ease;
+        }
+        input:focus { border-color: var(--primary-gold) !important; outline: none; box-shadow: 0 0 10px var(--border-glow); }
+        
+        .terminal-feed { color: #fbbf24; opacity: 0.8; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--primary-gold); border-radius: 10px; }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <nav class="border-b border-white/5 px-8 py-5 flex justify-between items-center bg-[#080808]/80 backdrop-blur-md sticky top-0 z-[100]">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-700 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-900/20">
+                <i class="bi bi-shield-check text-black text-2xl"></i>
+            </div>
+            <div>
+                <h1 class="font-extrabold text-xl tracking-tight text-white uppercase">Cyber-X <span class="text-yellow-500 italic">Titan</span></h1>
+                <p class="text-[9px] text-gray-500 font-mono tracking-widest">ADVANCED FORENSIC ASSESSMENT</p>
+            </div>
+        </div>
+        <div id="live-time" class="text-white text-sm bg-white/5 px-4 py-1 rounded-full border border-white/10 font-mono">00:00:00</div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto mt-10 px-6 grid grid-cols-12 gap-8 mb-20">
+        
+        <div class="col-span-12 lg:col-span-8 space-y-6">
+            
+            <div class="premium-card p-1 flex rounded-2xl mb-2 overflow-hidden border border-white/5 font-mono">
+                <button onclick="navStep(1)" id="b1" class="flex-1 py-4 text-[10px] font-bold tracking-widest tab-active">01 PROFILING</button>
+                <button onclick="navStep(2)" id="b2" class="flex-1 py-4 text-[10px] font-bold tracking-widest">02 FINANCIALS</button>
+                <button onclick="navStep(3)" id="b3" class="flex-1 py-4 text-[10px] font-bold tracking-widest">03 EVIDENCE</button>
+                <button onclick="navStep(4)" id="b4" class="flex-1 py-4 text-[10px] font-bold tracking-widest">04 INTEGRITY</button>
+            </div>
+
+            <div id="s1" class="step-div premium-card p-8 rounded-3xl animate__animated animate__fadeIn">
+                <h3 class="text-xl font-bold text-yellow-500 mb-8 flex items-center gap-3 italic uppercase tracking-tighter">Case Profiling</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <label class="text-[11px] font-bold text-gray-500 uppercase mb-3 block">Victim Full Name</label>
+                        <input type="text" id="name" placeholder="Legal Name" class="w-full p-4 rounded-xl text-sm">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-gray-500 uppercase mb-3 block">Fraud Category</label>
+                        <select id="modus" class="w-full p-4 rounded-xl text-sm" onchange="runEngine()">
+                            <option value="0">Select Category</option>
+                            <option value="25">UPI / Banking / Phishing</option>
+                            <option value="20">Social Identity Theft</option>
+                            <option value="30">High-Stake Investment Scam</option>
+                            <option value="35">Sextortion / Blackmail</option>
+                        </select>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="text-[11px] font-bold text-gray-500 uppercase mb-3 block">Incident Summary</label>
+                        <textarea id="summary" rows="3" class="w-full p-4 rounded-xl text-sm" placeholder="Provide event sequence..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div id="s2" class="step-div hidden premium-card p-8 rounded-3xl animate__animated animate__fadeIn">
+                <h3 class="text-xl font-bold text-yellow-500 mb-8 flex items-center gap-3 italic uppercase tracking-tighter">Financial Tracking</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <label class="text-[11px] font-bold text-gray-500 uppercase mb-3 block">Loss Amount (INR)</label>
+                        <input type="number" id="amt" class="w-full p-4 rounded-xl text-sm" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-gray-500 uppercase mb-3 block">UTR / Transaction ID</label>
+                        <input type="text" id="utr" class="w-full p-4 rounded-xl text-sm" placeholder="Reference No.">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="text-[11px] font-bold text-gray-500 uppercase mb-3 block">Suspect Detail (UPI/Account)</label>
+                        <input type="text" id="suspect_id" class="w-full p-4 rounded-xl text-sm" placeholder="Fraudster Handle" oninput="runEngine()">
+                    </div>
+                </div>
+            </div>
+
+            <div id="s3" class="step-div hidden premium-card p-8 rounded-3xl animate__animated animate__fadeIn">
+                <h3 class="text-xl font-bold text-yellow-500 mb-8 flex items-center gap-3 italic uppercase tracking-tighter">Digital Evidence Vault</h3>
+                <div class="space-y-4">
+                    <label class="flex items-center justify-between p-5 bg-white/5 rounded-2xl border border-white/5 cursor-pointer">
+                        <span class="font-bold text-sm">Official Bank Statement</span>
+                        <input type="checkbox" class="ev-check w-6 h-6 accent-yellow-500" data-pts="20" data-label="Bank Statement" onchange="runEngine()">
+                    </label>
+                    <label class="flex items-center justify-between p-5 bg-white/5 rounded-2xl border border-white/5 cursor-pointer">
+                        <span class="font-bold text-sm">Chat Exports / Logs</span>
+                        <input type="checkbox" class="ev-check w-6 h-6 accent-yellow-500" data-pts="15" data-label="Chat Logs" onchange="runEngine()">
+                    </label>
+                    <label class="flex items-center justify-between p-5 bg-white/5 rounded-2xl border border-white/5 cursor-pointer">
+                        <span class="font-bold text-sm">Fraudulent Links/Apps</span>
+                        <input type="checkbox" class="ev-check w-6 h-6 accent-yellow-500" data-pts="10" data-label="URL/App Proof" onchange="runEngine()">
+                    </label>
+                </div>
+            </div>
+
+            <div id="s4" class="step-div hidden premium-card p-8 rounded-3xl animate__animated animate__fadeIn">
+                <h3 class="text-xl font-bold text-yellow-500 mb-8 flex items-center gap-3 italic uppercase tracking-tighter">Final Validation</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="p-6 bg-red-500/5 border border-red-500/20 rounded-2xl">
+                        <p class="text-[11px] font-bold text-red-500 mb-4 uppercase">Forensic Penalties</p>
+                        <label class="flex items-center gap-3 text-xs mb-3">
+                            <input type="checkbox" class="p-check" data-val="35" data-label="Device Factory Reset" onchange="runEngine()"> Device Factory Reset
+                        </label>
+                        <label class="flex items-center gap-3 text-xs">
+                            <input type="checkbox" class="p-check" data-val="20" data-label="Edited Proofs" onchange="runEngine()"> Cropped Screenshots
+                        </label>
+                    </div>
+                    <div class="p-6 bg-yellow-500/5 border border-yellow-500/20 rounded-2xl">
+                        <p class="text-[11px] font-bold text-yellow-500 mb-4 uppercase">Time Delta</p>
+                        <input type="range" id="t_gap" min="1" max="100" value="1" oninput="runEngine()" class="w-full accent-yellow-500">
+                        <p id="t_label" class="text-[10px] mt-4 font-mono text-gray-400">Phase I (0-24 Hours)</p>
+                    </div>
+                </div>
+                <button onclick="downloadReport()" class="w-full mt-10 py-5 bg-yellow-500 hover:bg-yellow-400 text-black font-extrabold text-sm rounded-2xl transition-all shadow-xl shadow-yellow-900/30 uppercase tracking-widest">
+                    Generate Final Dossier
+                </button>
+            </div>
+        </div>
+
+        <div class="col-span-12 lg:col-span-4 space-y-6">
+            <div class="premium-card p-10 rounded-[2.5rem] sticky top-28 border border-yellow-500/20 gold-glow">
+                <div class="text-center mb-10">
+                    <p class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2">Confidence Matrix</p>
+                    <div id="big-score" class="text-8xl font-black text-white tracking-tighter">00</div>
+                    <div id="grade" class="text-[10px] font-bold mt-4 text-yellow-500 border border-yellow-500/30 px-4 py-1 rounded-full uppercase mono">Initialized</div>
+                </div>
+                <div id="term" class="text-[9px] font-mono text-gray-500 leading-relaxed h-32 overflow-y-auto border-t border-white/5 pt-4">
+                    [SYSTEM]: Awaiting user parameters...
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="mt-20 border-t border-white/5 py-10 text-center">
+        <p class="text-gray-500 text-[10px] tracking-widest font-mono">© 2025 CYBER-X TITAN | ALL RIGHTS RESERVED</p>
+        <p class="text-gray-400 text-[10px] mt-2 uppercase font-bold tracking-tighter">Developed with ❤️ by <span class="text-yellow-500 italic">Gemini Pro</span></p>
+    </footer>
+
+    <script>
+        setInterval(() => { document.getElementById('live-time').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
+
+        function navStep(n) {
+            document.querySelectorAll('.step-div').forEach(s => s.classList.add('hidden'));
+            for(let i=1; i<=4; i++) document.getElementById('b'+i).classList.remove('tab-active');
+            document.getElementById('s' + n).classList.remove('hidden');
+            document.getElementById('b' + n).classList.add('tab-active');
+        }
+
+        function runEngine() {
+            let score = 0;
+            score += parseInt(document.getElementById('modus').value);
+            document.querySelectorAll('.ev-check').forEach(c => { if(c.checked) score += parseInt(c.dataset.pts); });
+            if(document.getElementById('suspect_id').value.length > 3) score += 15;
+            
+            const t = document.getElementById('t_gap').value;
+            let bonus = 20;
+            if(t > 30) { bonus = 10; document.getElementById('t_label').innerText = "Phase II (Delayed)"; }
+            if(t > 70) { bonus = 3; document.getElementById('t_label').innerText = "Phase III (Critical)"; }
+            score += bonus;
+            
+            document.querySelectorAll('.p-check').forEach(p => { if(p.checked) score -= parseInt(p.dataset.val); });
+            score = Math.max(0, Math.min(100, score));
+            document.getElementById('big-score').innerText = score.toString().padStart(2, '0');
+            
+            let g = score > 70 ? "High Priority" : (score > 40 ? "Actionable" : "Insufficient");
+            document.getElementById('grade').innerText = g;
+        }
+
+        async function downloadReport() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const score = document.getElementById('big-score').innerText;
+            const status = document.getElementById('grade').innerText;
+
+            // Report Header
+            doc.setFillColor(30, 30, 30);
+            doc.rect(0, 0, 210, 40, 'F');
+            doc.setTextColor(251, 191, 36);
+            doc.setFontSize(22);
+            doc.setFont("helvetica", "bold");
+            doc.text("CYBER-X TITAN: CASE DOSSIER", 20, 25);
+            
+            doc.setFontSize(10);
+            doc.setTextColor(200, 200, 200);
+            doc.text(`CONFIDENCE SCORE: ${score}/100`, 150, 20);
+            doc.text(`PRIORITY: ${status.toUpperCase()}`, 150, 27);
+
+            // Preparing Data Table
+            const evList = [];
+            document.querySelectorAll('.ev-check:checked').forEach(e => evList.push(e.dataset.label));
+            const penaltyList = [];
+            document.querySelectorAll('.p-check:checked').forEach(p => penaltyList.push(p.dataset.label));
+
+            const tableData = [
+                ["Victim Name", document.getElementById('name').value || "N/A"],
+                ["Incident Type", document.getElementById('modus').options[document.getElementById('modus').selectedIndex].text],
+                ["Amount Lost", `INR ${document.getElementById('amt').value || '0'}`],
+                ["Transaction ID", document.getElementById('utr').value || "N/A"],
+                ["Suspect Handle", document.getElementById('suspect_id').value || "N/A"],
+                ["Incident Delay", document.getElementById('t_label').innerText],
+                ["Evidence Provided", evList.join(", ") || "None"],
+                ["Forensic Red Flags", penaltyList.join(", ") || "None"]
+            ];
+
+            doc.autoTable({
+                startY: 50,
+                head: [['FIELD', 'DATA_INTEGRITY']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: { fillColor: [251, 191, 36], textColor: [0, 0, 0] },
+                styles: { font: 'courier', fontSize: 10 }
+            });
+
+            // Summary Box
+            const finalY = doc.lastAutoTable.finalY + 10;
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(12);
+            doc.text("NARRATIVE SUMMARY:", 20, finalY);
+            doc.setFontSize(9);
+            const splitSummary = doc.splitTextToSize(document.getElementById('summary').value || "No summary provided.", 170);
+            doc.text(splitSummary, 20, finalY + 7);
+
+            // Footer / Legal
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text("Generated via Cyber-X Titan System. Admissible under Sec 65B IEA logic.", 20, 285);
+            doc.text("This is an automated readiness report for law enforcement reference.", 20, 290);
+
+            doc.save(`TITAN_REPORT_${Date.now()}.pdf`);
+        }
+    </script>
+</body>
+</html>
